@@ -43,8 +43,10 @@ def _get_secret(key: str, default: str) -> str:
 
 
 COOKIE_KEY = _get_secret("COOKIE_KEY", "change_this_cookie_key_at_least_32_bytes_long")
-ADMIN_PASS = _get_secret("ADMIN_PASS", "admin123")
-USER_PASS = _get_secret("USER_PASS", "user123")
+USER_PASS = _get_secret("USER_PASS", "usuario123")
+FER_PASS = _get_secret("FER_PASS", "fer123")
+SEBITAS_PASS = _get_secret("SEBITAS_PASS", "sebitas123")
+ADMIN_USERS = {"fer"}
 
 # Map column synonyms (normalized) to canonical names
 COLUMN_ALIASES = {
@@ -101,16 +103,20 @@ PRIORIDAD_ALIASES = {
 # ---------- Authentication ----------
 # streamlit-authenticator v0.4+ uses Hasher().hash() per password
 hasher = stauth.Hasher()
-hashed_passwords = hasher.hash_list([ADMIN_PASS, USER_PASS])
+hashed_passwords = hasher.hash_list([USER_PASS, FER_PASS, SEBITAS_PASS])
 credentials = {
     "usernames": {
-        "admin": {
-            "name": "Administrador",
-            "password": hashed_passwords[0],
-        },
         "usuario": {
             "name": "Usuario",
+            "password": hashed_passwords[0],
+        },
+        "fer": {
+            "name": "Fer",
             "password": hashed_passwords[1],
+        },
+        "sebitas": {
+            "name": "Sebitas",
+            "password": hashed_passwords[2],
         },
     }
 }
@@ -851,7 +857,7 @@ st.dataframe(
 st.subheader("Exportar")
 export_buttons(filtered_df)
 
-if username == "admin":
+if username in ADMIN_USERS:
     projects_df = admin_panel(projects_df)
 else:
     st.info("Modo lectura: autenticado como usuario")
