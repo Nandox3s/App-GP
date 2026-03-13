@@ -33,6 +33,19 @@ REQUIRED_COLUMNS = [
     "Avance Real",
 ]
 
+
+def _get_secret(key: str, default: str) -> str:
+    """Read a secret from Streamlit Cloud; fallback to default locally."""
+    try:
+        return st.secrets[key]
+    except Exception:
+        return default
+
+
+COOKIE_KEY = _get_secret("COOKIE_KEY", "change_this_cookie_key_at_least_32_bytes_long")
+ADMIN_PASS = _get_secret("ADMIN_PASS", "admin123")
+USER_PASS = _get_secret("USER_PASS", "user123")
+
 # Map column synonyms (normalized) to canonical names
 COLUMN_ALIASES = {
     "Title": ["title", "titulo", "título", "resumen", "proyecto", "nombre", "nombreproyecto", "descripcion", "descripción"],
@@ -88,7 +101,7 @@ PRIORIDAD_ALIASES = {
 # ---------- Authentication ----------
 # streamlit-authenticator v0.4+ uses Hasher().hash() per password
 hasher = stauth.Hasher()
-hashed_passwords = hasher.hash_list(["admin123", "user123"])
+hashed_passwords = hasher.hash_list([ADMIN_PASS, USER_PASS])
 credentials = {
     "usernames": {
         "admin": {
@@ -104,7 +117,7 @@ credentials = {
 authenticator = stauth.Authenticate(
     credentials,
     "pmo_dashboard",
-    "auth",
+    COOKIE_KEY,
     cookie_expiry_days=1,
 )
 
